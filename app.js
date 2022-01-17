@@ -1,11 +1,19 @@
 const express = require('express')
+const dotenv = require('dotenv')
+
+//config
+dotenv.config({path:"./config/config.env"})
+const PORT = process.env.PORT || 5000
+
+// import routers
+const meals = require('./routes/meal')
+
+
+// mount 
 const app = express();
-// const port = 3000 || 5000;
 
-app.get('/api', (req, res) => {
-  res.send('Hello World!')
-});
+app.use('/api/v1/meal',meals)
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log(`Example app listening!`)
+app.listen( PORT, () => {
+  console.log(`Example app listening on port ${PORT} !`)
 });

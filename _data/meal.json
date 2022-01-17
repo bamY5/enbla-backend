@@ -1,0 +1,53 @@
+[{
+    "_id": "1",
+    "creator": "Abebe",
+    "phone_number": "+251911223344",
+    "where": "33.3351351, 44.3545678",
+    "when": "Dec 22, 2021, 12:00pm",
+    "joiners": [{"id":"11","name":"Ayele"},{"id":"22","name":"Ayele"}],
+    "title": "Launch",
+    "description":"Launch for three people, vegetarians",
+    "closed": false,
+    "number_of_joiners": 0
+
+},
+{
+    "_id": "2",
+    "creator": "Belete",
+    "phone_number": "+251911223344",
+    "where": "33.3351351, 44.3545678",
+    "when": "Dec 22, 2021, 06:00pm",
+    "joiners": [{"id":"2","name":"Bekele"},{"id":"2","name":"Ayele"}],
+    "title": "Dinner",
+    "description":"Dinner for three people, with wine",
+    "closed": true,
+    "number_of_joiners": 3
+
+},
+{
+    "_id": "3",
+    "creator": "Abebe",
+    "phone_number": "+251911223344",
+    "where": "33.3351351, 44.3545678",
+    "when": "Dec 22, 2021, 12:00pm",
+    "joiners": [{"id":"11","name":"Ayele"},{"id":"22","name":"Ayele"}],
+    "title": "Launch",
+    "description":"Launch for three people, vegetarians",
+    "closed": false,
+    "number_of_joiners": 0
+
+},
+{
+    "_id": "4",
+    "creator": "Belete",
+    "phone_number": "+251911223344",
+    "where": "33.3351351, 44.3545678",
+    "when": "Dec 22, 2021, 06:00pm",
+    "joiners": [{"id":"2","name":"Bekele"},{"id":"2","name":"Ayele"}],
+    "title": "Dinner",
+    "description":"Dinner for three people, with wine",
+    "closed": true,
+    "number_of_joiners": 3
+
+}
+]
