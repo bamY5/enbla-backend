@@ -3,8 +3,17 @@ const mongoose = require("mongoose")
 const LiematSchema = new mongoose.Schema({
     creator: {type: String,required: true},
     phoneNumber: {type: String,required: true},
-    where: {type: "Point", coordinate:{type: [Number],index: "2dsphere", required}},
-    when: {type: String, required: true},
+    location: {
+        type: {
+          type: String, 
+          enum: "Point", default: "Point",
+        },
+        coordinates: {
+          type: [Number],
+          required: true
+        }, 
+      },
+    time: {type: String, required: true},
     joiners: {
         type: [mongoose.Schema.ObjectId],
         ref:"UserModel",
@@ -18,4 +27,4 @@ const LiematSchema = new mongoose.Schema({
     numberOfJoiners: {type: Number, required: true}
 })
 
-module.exports = mongoose.Schema("Liemat", LiematSchema);
+module.exports = mongoose.model("Liemat", LiematSchema);
