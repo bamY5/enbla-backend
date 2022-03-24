@@ -14,13 +14,13 @@ exports.getLiemat = (req,res,next)=>{
 exports.createLiemat = async (req,res,next) =>{
     body = req.body
     liemat = {
-        creator: body.creator,
+        creator: req.user.id,
         phoneNumber: body.phone,
         location: {coordinates: [body.longitude,body.latitude]},
         time:body.time,
         joiners:[],
         title: body.title,
-        description: body.title,
+        description: body.description,
         numberOfJoiners: body.numberOfJoiners
     }
     result = await Liemat.create(liemat)

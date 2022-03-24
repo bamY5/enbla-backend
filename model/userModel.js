@@ -34,10 +34,6 @@ const UserModel = new mongoose.Schema({
         type:String,
         
     },
-
-    location: {
-        type: String,
-    },
     bio: {
         type: String,
         maxlength: 200,
@@ -49,11 +45,9 @@ const UserModel = new mongoose.Schema({
         type: String
     },
     social_profile: {
-        email: {type: String},
         twitter: {type: String},
         facebook: {type: String},
-        instagram: {type: String},
-        tiktok: {type: String},
+        instagram: {type: String}
     },
     public_metrics: {
         follower_count: Number,

@@ -1,6 +1,6 @@
 const User = require('../model/userModel')
 const ErrorResponse = require('../util/errorResponse')
-
+const validateInput = require('../util/validateRegisterInput')
 
 exports.signin = async(req,res,next)=>{
     const username = req.body.username
@@ -34,17 +34,48 @@ exports.signin = async(req,res,next)=>{
 
 
 exports.register = async (req,res,next)=>{
-    body = req.body
+    data = req.body
+    if(!validateInput(data)){
+        return next(new ErrorResponse("Invalid input",400))
+    }
 
-    user = await User.create({name: body.name, username: body.username, phone: body.phone, password: body.password})
+    obj = {
+        name: data.name, 
+        username: data.username, 
+        phone: data.phone, 
+        password: data.password,
+        email: data.email || "",
+        avatar: data.avatar || "",
+        bio: data.bio || "",
+        profile_image_url: data.profile_image || "",
+        birthday: data.birthday || "",
+        social_profile: {
+            twitter: data.twitter || "",
+            facebook: data.facebook || "",
+            instagram: data.instagram || "",
+        },
+        public_metrics: {
+            follower_count: 0,
+            following_count: 0
+        }
+    }
 
-    // Create token
-    const token = user.signWithJWT();
-
-    res.json({
-        success: true,
-        token
-    })
 
 
+    user = await User.findOne({username: data.username});
+
+    if(user){
+        return next(new ErrorResponse("User already exist",400))
+    }else{
+        newUser = await User.create(obj)
+        // Create token
+        const token = newUser.signWithJWT();
+
+        res.json({
+            success: true,
+            token
+        })
+
+    }
 }
+

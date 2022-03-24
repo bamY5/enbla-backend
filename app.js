@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const body_parser = require('body-parser')
 const ErrorHandler = require('./middleware/error')
+const morgan = require('morgan')
 //config
 dotenv.config({path:"./config/config.env"})
 const PORT = process.env.PORT || 5000
@@ -19,6 +20,9 @@ const auth = require('./routes/auth')
 const app = express();
 app.use(body_parser.json())
 app.use(body_parser.urlencoded({extended: true}))
+
+// Dev logging middleware
+app.use(morgan('dev'))
 
 
 app.use('/api/v1/liemat',liemat);

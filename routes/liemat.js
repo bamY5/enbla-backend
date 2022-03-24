@@ -1,27 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const liematController = require("../controller/liemat")
+const { authorize } = require('../middleware/authorize')
 
-router.route('/:id').get(liematController.getLiemat)
+
+router.get('/',liematController.getLiemat)
 // router.route('/').get()
-router.route('/:creatorId').get()
-router.route('/place').get()
-router.route('/:joinerId').get()
+router.get('/:creatorId')
+router.get('/place')
+router.get('/:joinerId')
 
 
-router.route('/').post(liematController.createLiemat)
+router.post('/',authorize ,liematController.createLiemat)
 
 //add joiner to liemat
-router.route('/:joinerId').put()
+// router.route('/:joinerId').put()
 
-//edit liemat 
-router.route('/:id').put()
+// //edit liemat 
+// router.route('/:id').put()
 
-//remove joiner from liemat
-router.route('/:joinerId').put()
+// //remove joiner from liemat
+// router.route('/:joinerId').put()
 
-//delete liemat
-router.route('/:id').delete()
+// //delete liemat
+// router.route('/:id').delete()
 
 
 

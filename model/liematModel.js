@@ -1,7 +1,11 @@
 const mongoose = require("mongoose")
 
 const LiematSchema = new mongoose.Schema({
-    creator: {type: String,required: true},
+    creator: {
+      type: mongoose.Schema.ObjectId,
+      ref:"UserModel",
+      required: true
+    },
     phoneNumber: {type: String,required: true},
     location: {
         type: {
