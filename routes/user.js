@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const authorize = require('../middleware/authorize')
+const {authorize} = require('../middleware/authorize')
 const {
     getUser,
     updateUser
@@ -9,7 +9,7 @@ const {
 
 router.get('/:id',getUser)
 
-router.post('/',updateUser)
+router.put('/:id',authorize,updateUser)
 
 
 

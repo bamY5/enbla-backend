@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 
-const MatchUser = (req,id) =>{
+const MatchUser = (req,res,id) =>{
     let token;
 
     if(req.headers.authorization && req.headers.authorization.split(' ')[0] == "Bearer"){

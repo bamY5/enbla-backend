@@ -30,10 +30,6 @@ const UserModel = new mongoose.Schema({
             'Please add a valid email'
         ]
     },
-    avatar: {
-        type:String,
-        
-    },
     bio: {
         type: String,
         maxlength: 200,
