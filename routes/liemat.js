@@ -14,9 +14,9 @@ router.get('/:joinerId')
 router.post('/',authorize ,liematController.createLiemat)
 
 //add joiner to liemat
-// router.route('/:joinerId').put()
+router.put('/join-liemat/:id',authorize,liematController.joinLiemat)
 
-// //edit liemat 
+//edit liemat 
 // router.route('/:id').put()
 
 // //remove joiner from liemat

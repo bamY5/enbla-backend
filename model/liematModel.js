@@ -7,15 +7,9 @@ const LiematSchema = new mongoose.Schema({
       required: true
     },
     phoneNumber: {type: String,required: true},
-    location: {
-        type: {
-          type: String, 
-          enum: "Point", default: "Point",
-        },
-        coordinates: {
-          type: [Number],
-          required: true
-        }, 
+    place: {
+        type: String,
+        maxlength: 50, 
       },
     time: {type: String, required: true},
     joiners: {
