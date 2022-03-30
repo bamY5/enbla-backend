@@ -1,9 +1,8 @@
 const mongoose = require("mongoose")
 
-const LiematSchema = new mongoose.Schema({
+const LiematModel = new mongoose.Schema({
     creator: {
-      type: mongoose.Schema.ObjectId,
-      ref:"UserModel",
+      type: Object,
       required: true
     },
     phoneNumber: {type: String,required: true},
@@ -16,6 +15,10 @@ const LiematSchema = new mongoose.Schema({
         type: [mongoose.Schema.ObjectId],
         ref:"UserModel",
     },
+    joined:{
+      type: Number,
+      default:0
+    },
     title: {type: String, required: true},
     description: {
         type: String,
@@ -25,4 +28,11 @@ const LiematSchema = new mongoose.Schema({
     numberOfJoiners: {type: Number, required: true}
 })
 
-module.exports = mongoose.model("Liemat", LiematSchema);
+// update joined user number
+LiematModel.pre("save", async function(){
+  this.joiners = [this.creator.id];
+  this.joined = this.joined + 1;
+});
+
+
+module.exports = mongoose.model("Liemat", LiematModel);
