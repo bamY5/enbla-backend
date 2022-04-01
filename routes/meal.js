@@ -1,15 +1,12 @@
-const express = require("express")
-const router = express.Router()
-const mealController = require('../controller/meal')
+const express = require("express");
+const router = express.Router();
+const mealController = require("../controller/meal");
+const { authorize } = require("../middleware/authorize");
 
-router.route('/').get(mealController.getMeal)
-router.route('/:id').get()
+router.get("/", mealController.getThread);
 
-router.route('/').post(mealController.createMeal)
-router.route('/').put()
+router.post("/", authorize, mealController.createThread);
 
-router.route('/').delete()
+router.put("/:id", authorize, mealController.replyToThread);
 
-
-
-module.exports = router
+module.exports = router;

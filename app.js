@@ -3,12 +3,15 @@ const dotenv = require('dotenv')
 const body_parser = require('body-parser')
 const ErrorHandler = require('./middleware/error')
 const morgan = require('morgan')
+const fileupload = require('express-fileupload');
 //config
 dotenv.config({path:"./config/config.env"})
 const PORT = process.env.PORT || 5000
 
 // connect db
-const db = require('./config/db').db;
+const db = require('./config/db').connect();
+
+
 
 // import routers
 const liemat = require('./routes/liemat');
@@ -24,6 +27,8 @@ app.use(body_parser.urlencoded({extended: true}))
 // Dev logging middleware
 app.use(morgan('dev'))
 
+// File upload
+app.use(fileupload());
 
 app.use('/api/v1/liemat',liemat);
 app.use('/api/v1/meal',meal);
