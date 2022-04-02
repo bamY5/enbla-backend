@@ -1,12 +1,13 @@
 const path = require("path");
 const MealThread = require("../../model/mealModel");
+const fs = require("fs");
 
-exports.newThread = async (query, media) => {
-	return await thread(query, media, false);
+exports.newThread = async (query, media, user) => {
+	return await thread(query, media, user, false);
 };
 
-exports.replyThread = async (query, media, threadId) => {
-	const { error, data } = await thread(query, media, true);
+exports.replyThread = async (query, media, threadId, user) => {
+	const { error, data } = await thread(query, media, user, true);
 
 	if (error) {
 		return {
@@ -23,7 +24,7 @@ exports.replyThread = async (query, media, threadId) => {
 	if (!originalThread) {
 		await MealThread.findByIdAndDelete(data.id);
 		return {
-			err: false,
+			err: true,
 			data: null,
 		};
 	}
@@ -33,7 +34,7 @@ exports.replyThread = async (query, media, threadId) => {
 	};
 };
 
-const thread = async (query, media, isReply) => {
+const thread = async (query, media, user, isReply) => {
 	const result = {
 		error: false,
 		data: null,
@@ -45,9 +46,14 @@ const thread = async (query, media, isReply) => {
 
 	const meal = await MealThread.create(query);
 	var i = 0;
+	let dir = fs.mkdirSync(
+		`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/photo`,
+		{ recursive: true }
+	);
 	for (var prop in media) {
 		let img = media[prop];
-		img.mv(`${process.env.FILE_UPLOAD_PATH}/${meal.media[i]}`, async (err) => {
+
+		img.mv(`${dir}/${meal.media[i]}`, async (err) => {
 			if (err) {
 				await MealThread.findOneAndDelete(meal.id);
 				return {

@@ -9,4 +9,8 @@ router.post("/", authorize, mealController.createThread);
 
 router.put("/:id", authorize, mealController.replyToThread);
 
+router.put("/like/:id", authorize, mealController.likeThread);
+
+router.delete("/:id", authorize, mealController.deleteThread);
+
 module.exports = router;

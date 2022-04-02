@@ -44,7 +44,7 @@ MealThread.pre("save", function () {
 	if (this.media) {
 		for (var i = 0; i < this.media.length; i++) {
 			let image = this.media[i];
-			let filename = `photo_${this.id}-${i}${path.parse(image).ext}`;
+			let filename = `${i}${path.parse(image).ext}`;
 			this.media[i] = filename;
 		}
 	}
