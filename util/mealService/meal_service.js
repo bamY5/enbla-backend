@@ -47,13 +47,13 @@ const thread = async (query, media, user, isReply) => {
 	const meal = await MealThread.create(query);
 	var i = 0;
 	let dir = fs.mkdirSync(
-		`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/photo`,
+		`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/${meal.id}/photo`,
 		{ recursive: true }
 	);
 	for (var prop in media) {
 		let img = media[prop];
-
-		img.mv(`${dir}/${meal.media[i]}`, async (err) => {
+		console.log(dir);
+		await img.mv(`${dir}/${meal.id}/photo/${meal.media[i]}`, async (err) => {
 			if (err) {
 				await MealThread.findOneAndDelete(meal.id);
 				return {
