@@ -18,7 +18,6 @@ exports.registerUser = async (obj, profile = null) => {
 			`${process.env.FILE_UPLOAD_PATH}/${user.username}/profile`,
 			{ recursive: true }
 		);
-		console.log(dir);
 
 		await profile.mv(`${dir}/profile/${user.profile_image}`, async (err) => {
 			if (err) {

@@ -36,7 +36,7 @@ exports.createThread = async (req, res, next) => {
 		for (var prop in files) {
 			let image = files[prop];
 			if (image.mimetype.startsWith("image")) {
-				post.media.push(image.name);
+				post.media.push({ filepath: "", filename: image.name });
 			}
 		}
 	}
@@ -71,10 +71,11 @@ exports.replyToThread = async (req, res, next) => {
 		for (var prop in files) {
 			let image = files[prop];
 			if (image.mimetype.startsWith("image")) {
-				post.media.push(image.name);
+				post.media.push({ filepath: "", filename: image.name });
 			}
 		}
 	}
+
 	const { err, data } = await threadService.replyThread(
 		post,
 		files,

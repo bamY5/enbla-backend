@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
 const body_parser = require("body-parser");
@@ -27,6 +28,9 @@ app.use(morgan("dev"));
 
 // File upload
 app.use(fileupload());
+
+//Static Folder
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/v1/liemat", liemat);
 app.use("/api/v1/meal", meal);

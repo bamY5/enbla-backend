@@ -44,16 +44,36 @@ const thread = async (query, media, user, isReply) => {
 		query.is_reply = true;
 	}
 
-	const meal = await MealThread.create(query);
+	let meal = await MealThread.create(query);
 	var i = 0;
+
+	if (
+		!fs.exists(
+			path.join(
+				__dirname,
+				`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/photo`
+			),
+			(exists) => {
+				exists ? true : false;
+			}
+		)
+	) {
+		fs.mkdirSync(
+			`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/photo`,
+			{ recursive: true }
+		);
+	}
+
 	let dir = fs.mkdirSync(
-		`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/${meal.id}/photo`,
+		`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/photo/${meal.id}`,
 		{ recursive: true }
 	);
+
+	const tempMedia = [];
 	for (var prop in media) {
 		let img = media[prop];
-		console.log(dir);
-		await img.mv(`${dir}/${meal.id}/photo/${meal.media[i]}`, async (err) => {
+
+		await img.mv(`${dir}/${meal.media[i]["filename"]}`, async (err) => {
 			if (err) {
 				await MealThread.findOneAndDelete(meal.id);
 				return {
@@ -62,8 +82,20 @@ const thread = async (query, media, user, isReply) => {
 				};
 			}
 		});
+
+		tempMedia.push({
+			filepath: `/uploads/${user.username}/status/photo/${meal.id}`,
+			filename: meal.media[i].filename,
+		});
 		i++;
 	}
+	meal = await MealThread.findByIdAndUpdate(
+		meal.id,
+		{
+			$set: { media: tempMedia },
+		},
+		{ new: true }
+	);
 
 	return {
 		err: false,
