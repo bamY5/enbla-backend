@@ -4,7 +4,12 @@ const { validate } = require("../util/validateMealInput");
 const threadService = require("../util/mealService/meal_service");
 
 exports.getThread = async (req, res, next) => {
-	const threads = await MealThread.find();
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 5;
+
+	const threads = await MealThread.find()
+		.limit(limit)
+		.skip((page - 1) * limit);
 
 	res.json({
 		success: true,
