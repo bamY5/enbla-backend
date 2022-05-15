@@ -1,56 +1,48 @@
 const User = require("../model/userModel");
 const ErrorResponse = require("../util/errorResponse");
-const validateInput = require("../util/validateRegisterInput");
-const userService = require("../util/userService/userService");
-const { resolveSoa } = require("dns");
+const validateInput = require("../util/authService/validateAuthInput");
+const authService = require("../util/authService/authService");
 
 exports.signin = async (req, res, next) => {
-	const username = req.body.username;
-	const password = req.body.password;
-	if (!username || !password) {
-		next(new ErrorResponse("Please enter username and password", 404));
+	const { err, isValid } = validateInput.signin(req.body);
+
+	if (!isValid) {
+		return next(new ErrorResponse(err, 400));
+	}
+	const input = {};
+	input.username = req.body.username;
+	input.password = req.body.password;
+
+	const { error, statusCode, data } = await authService.signIn(input);
+
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
 	}
 
-	var user = await User.findOne({ username }).select("+password");
-
-	if (!user) {
-		return next(new ErrorResponse("Invalid Credential", 401));
-	}
-
-	// Check if password matches
-	const isMatch = await user.matchPassword(password);
-
-	if (!isMatch) {
-		return next(new ErrorResponse(`Invalid Credential`, 401));
-	} else {
-		const token = await user.signWithJWT();
-		res.json({
-			success: true,
-			token,
-		});
-	}
+	res.status(statusCode).json({
+		success: true,
+		data,
+	});
 };
 
 exports.register = async (req, res, next) => {
-	data = req.body;
-	const { errors, isValid } = validateInput(data);
+	const { err, isValid } = validateInput.register(req.body);
 	if (!isValid) {
-		return next(new ErrorResponse(errors, 400));
+		return next(new ErrorResponse(err, 400));
 	}
 
-	obj = {
-		name: data.name,
-		username: data.username,
-		phone: data.phone,
-		password: data.password,
-		email: data.email || "",
-		bio: data.bio || "",
-		birthday: data.birthday || "",
-		profile_image: "",
+	const obj = {
+		name: req.body.name,
+		username: req.body.username,
+		phone: req.body.phone,
+		password: req.body.password,
+		email: req.body.email || "",
+		bio: req.body.bio || "",
+		birthday: req.body.birthday || "",
 		social_profile: {
-			twitter: data.twitter || "",
-			facebook: data.facebook || "",
-			instagram: data.instagram || "",
+			twitter: req.body.twitter || "",
+			facebook: req.body.facebook || "",
+			instagram: req.body.instagram || "",
 		},
 		public_metrics: {
 			follower_count: 0,
@@ -58,26 +50,18 @@ exports.register = async (req, res, next) => {
 		},
 	};
 
-	// const user = await User.findOne({ username: data.username });
-
 	const files = req.files;
-	let profile;
-	if (files) {
-		obj.profile_image = files.profile.name;
-		profile = files.profile;
-	}
-
-	const { error, response, statusCode } = await userService.registerUser(
+	const { error, statusCode, data } = await authService.registerUser(
 		obj,
-		profile
+		files
 	);
 
 	if (error) {
-		return next(new ErrorResponse(response, statusCode));
+		return next(new ErrorResponse(error, statusCode));
 	}
 
 	res.status(statusCode).json({
 		success: true,
-		token: response,
+		data,
 	});
 };

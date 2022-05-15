@@ -1,20 +1,22 @@
 const MealThread = require("../model/mealModel");
 const ErrorResponse = require("../util/errorResponse");
-const { validate } = require("../util/validateMealInput");
+const { validate } = require("../util/mealService/validateMealInput");
 const threadService = require("../util/mealService/meal_service");
 
 exports.getThread = async (req, res, next) => {
 	const page = parseInt(req.query.page, 10) || 1;
 	const limit = parseInt(req.query.limit, 10) || 5;
 
-	const threads = await MealThread.find()
-		.limit(limit)
-		.skip((page - 1) * limit);
+	const { err, statusCode, data } = await threadService.getThread(page, limit);
 
-	res.json({
+	if (err) {
+		return next(new ErrorResponse(err, statusCode));
+	}
+
+	res.status(statusCode).json({
 		success: true,
-		count: threads.length,
-		data: threads,
+		count: data.length,
+		data,
 	});
 };
 
@@ -31,31 +33,26 @@ exports.createThread = async (req, res, next) => {
 	post.creator = req.user.id;
 	const files = req.files;
 
-	if (files) {
-		post.media = [];
-		for (var prop in files) {
-			let image = files[prop];
-			if (image.mimetype.startsWith("image")) {
-				post.media.push({ filepath: "", filename: image.name });
-			}
-		}
-	}
-	const { err, data } = await threadService.newThread(post, files, req.user);
+	const { err, statusCode, data } = await threadService.newThread(
+		post,
+		files,
+		req.user
+	);
 
 	if (err) {
-		return next(new ErrorResponse("Operation Failed", 500));
+		return next(new ErrorResponse(err, statusCode));
 	}
 
-	res.status(200).json({
+	res.status(statusCode).json({
 		success: true,
-		data: data,
+		data,
 	});
 };
 
 exports.replyToThread = async (req, res, next) => {
 	const threadId = req.params.id;
 	const post = {};
-	let meal;
+
 	const { error, isValid } = validate(req.body);
 
 	if (!isValid) {
@@ -66,25 +63,15 @@ exports.replyToThread = async (req, res, next) => {
 	post.creator = req.user.id;
 	const files = req.files;
 
-	if (files) {
-		post.media = [];
-		for (var prop in files) {
-			let image = files[prop];
-			if (image.mimetype.startsWith("image")) {
-				post.media.push({ filepath: "", filename: image.name });
-			}
-		}
-	}
-
-	const { err, data } = await threadService.replyThread(
+	const { err, statusCode, data } = await threadService.replyThread(
 		post,
 		files,
-		req.user,
-		threadId
+		threadId,
+		req.user
 	);
 
 	if (err) {
-		return next(new ErrorResponse("Operation Failed", 500));
+		return next(new ErrorResponse(err, statusCode));
 	}
 
 	res.status(200).json({
@@ -96,49 +83,31 @@ exports.replyToThread = async (req, res, next) => {
 exports.likeThread = async (req, res, next) => {
 	const id = req.params.id;
 
-	const thread = await MealThread.findByIdAndUpdate(
+	const { err, statusCode, data } = await threadService.likeThread(
 		id,
-		{
-			$push: { "public_metrices.likes": req.user.id },
-			$inc: { "public_metrices.like_count": 1 },
-		},
-		{ new: true }
+		req.user.id
 	);
 
-	if (!thread) {
-		return next(new ErrorResponse("Like operation failed", 400));
+	if (err) {
+		return next(new ErrorResponse(err, statusCode));
 	}
 
-	res.status(200).json({
+	res.status(statusCode).json({
 		success: true,
-		data: thread,
+		data,
 	});
 };
 
 exports.deleteThread = async (req, res, next) => {
 	const id = req.params.id;
+	const { err, statusCode, data } = await threadService.deleteThread(id);
 
-	const thread = await MealThread.findByIdAndDelete(id);
-
-	if (!thread) {
-		return next(new ErrorResponse("Delete operation failed", 400));
+	if (err) {
+		return next(new ErrorResponse(err, statusCode));
 	}
 
-	const replys = thread.public_metrices.replys;
-
-	if (replys) {
-		replys.map(async function (replyId) {
-			try {
-				await MealThread.findByIdAndDelete(replyId);
-			} catch (e) {
-				console.log(e);
-				return next(new ErrorResponse("Delete Operation unsuccessful", 500));
-			}
-		});
-	}
-
-	res.status(200).json({
+	res.status(statusCode).json({
 		success: true,
-		data: thread,
+		data,
 	});
 };

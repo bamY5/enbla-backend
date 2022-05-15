@@ -29,9 +29,6 @@ app.use(morgan("dev"));
 // File upload
 app.use(fileupload());
 
-//Static Folder
-app.use(express.static(path.join(__dirname, "public")));
-
 app.use("/api/v1/liemat", liemat);
 app.use("/api/v1/meal", meal);
 app.use("/api/v1/user", user);

@@ -1,6 +1,27 @@
 const path = require("path");
 const MealThread = require("../../model/mealModel");
 const fs = require("fs");
+const { upload, deleteImage } = require("../fileUpload");
+
+exports.getThread = async (page, limit) => {
+	try {
+		const threads = await MealThread.find()
+			.limit(limit)
+			.skip((page - 1) * limit);
+
+		return {
+			err: null,
+			statusCode: 200,
+			data: threads,
+		};
+	} catch (error) {
+		return {
+			err: error.message,
+			statusCode: 500,
+			result: null,
+		};
+	}
+};
 
 exports.newThread = async (query, media, user) => {
 	return await thread(query, media, user, false);
@@ -11,94 +32,140 @@ exports.replyThread = async (query, media, threadId, user) => {
 
 	if (error) {
 		return {
-			err: true,
+			err: error.message,
+			statusCode: 500,
 			data: null,
 		};
 	}
 
-	const originalThread = await MealThread.findByIdAndUpdate(threadId, {
-		$push: { "public_metrices.replys": data.id },
-		$inc: { "public_metrices.reply_count": 1 },
-	});
+	try {
+		const originalThread = await MealThread.findByIdAndUpdate(
+			threadId,
+			{
+				$push: { "public_metrices.replys": data.id },
+				$inc: { "public_metrices.reply_count": 1 },
+			},
+			{ new: true }
+		);
 
-	if (!originalThread) {
+		return {
+			err: null,
+			statusCode: 200,
+			data: originalThread,
+		};
+	} catch (error) {
 		await MealThread.findByIdAndDelete(data.id);
 		return {
-			err: true,
+			err: error.message,
+			statusCode: 500,
 			data: null,
 		};
 	}
-	return {
-		err: false,
-		data: data,
-	};
 };
 
-const thread = async (query, media, user, isReply) => {
-	const result = {
-		error: false,
-		data: null,
-	};
-
-	if (isReply) {
-		query.is_reply = true;
-	}
-
-	let meal = await MealThread.create(query);
-	var i = 0;
-
-	if (
-		!fs.exists(
-			path.join(
-				__dirname,
-				`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/photo`
-			),
-			(exists) => {
-				exists ? true : false;
-			}
-		)
-	) {
-		fs.mkdirSync(
-			`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/photo`,
-			{ recursive: true }
+exports.likeThread = async (id, userId) => {
+	try {
+		const thread = await MealThread.findByIdAndUpdate(
+			id,
+			{
+				$push: { "public_metrices.likes": userId },
+				$inc: { "public_metrices.like_count": 1 },
+			},
+			{ new: true }
 		);
+		return {
+			err: null,
+			statusCode: 200,
+			data: thread,
+		};
+	} catch (error) {
+		return {
+			err: error.message,
+			statusCode: 500,
+			data: null,
+		};
 	}
+};
 
-	let dir = fs.mkdirSync(
-		`${process.env.FILE_UPLOAD_PATH}/${user.username}/status/photo/${meal.id}`,
-		{ recursive: true }
-	);
+exports.deleteThread = async (id) => {
+	try {
+		const res = await MealThread.findById(id);
 
-	const tempMedia = [];
-	for (var prop in media) {
-		let img = media[prop];
-
-		await img.mv(`${dir}/${meal.media[i]["filename"]}`, async (err) => {
-			if (err) {
-				await MealThread.findOneAndDelete(meal.id);
+		//delete from cloudinary
+		for (const media of res.media) {
+			console.log(media.imageId);
+			const { error, result } = await deleteImage(media.imageId);
+			if (error) {
 				return {
-					err: true,
+					err: error.message,
+					statusCode: 500,
 					data: null,
 				};
 			}
-		});
+		}
 
-		tempMedia.push({
-			filepath: `/uploads/${user.username}/status/photo/${meal.id}`,
-			filename: meal.media[i].filename,
-		});
-		i++;
+		const thread = await MealThread.findByIdAndDelete(id);
+
+		return {
+			err: null,
+			statusCode: 201,
+			data: thread,
+		};
+	} catch (error) {
+		return {
+			err: error.message,
+			statusCode: 500,
+			data: null,
+		};
 	}
-	meal = await MealThread.findByIdAndUpdate(
-		meal.id,
-		{
-			$set: { media: tempMedia },
-		},
-		{ new: true }
-	);
+};
 
-	return {
-		err: false,
-		data: meal,
-	};
+const thread = async (query, media, user, isReply) => {
+	try {
+		if (isReply) {
+			query.is_reply = true;
+		}
+
+		let meal = await MealThread.create(query);
+		var i = 0;
+
+		const tempMedia = [];
+		for (var prop in media) {
+			let image = media[prop];
+			const { error, result } = await upload(image, "meal");
+
+			if (error) {
+				await MealThread.findByIdAndDelete(meal.id);
+				return {
+					err: error.message,
+					statusCode: 500,
+					data: null,
+				};
+			}
+
+			tempMedia.push({
+				imageUrl: result.secure_url,
+				imageId: result.public_id,
+			});
+		}
+		meal = await MealThread.findByIdAndUpdate(
+			meal.id,
+			{
+				$set: { media: tempMedia },
+			},
+			{ new: true }
+		);
+
+		return {
+			err: null,
+			statusCode: 200,
+			data: meal,
+		};
+	} catch (error) {
+		return {
+			err: error.message,
+			statusCode: 400,
+			data: null,
+		};
+	}
 };

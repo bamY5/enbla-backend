@@ -1,71 +1,83 @@
-const User = require('../model/userModel');
-const ErrorResponse = require('../util/errorResponse');
-const matchUser = require('../util/matchUser');
-const isValidateProfile = require('../util/validateProfile');
+const User = require("../model/userModel");
+const ErrorResponse = require("../util/errorResponse");
+const matchUser = require("../util/matchUser");
+const isValidateProfile = require("../util/userService/validateProfile");
+const userService = require("../util/userService/userService");
 
-exports.getUser = async (req,res,next)=>{
-    const id = req.params.id;
-    const user = await User.findById(id);
-    let usr;
+exports.getUser = async (req, res, next) => {
+	const id = req.params.id;
 
-    if(!user){
-        return next(new ErrorResponse("User not found",400))
-    }
+	const { error, statusCode, data } = await userService.getUserById(id);
 
-    usr = {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        bio: user.bio,
-        public_metrics: user.public_metrics,
-        profile_img: user.profile_image_url,
-        verified: user.verified,
-        createdAt: user.createdAt
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
 
-    }
+	res.status(statusCode).json({
+		success: true,
+		data,
+	});
+};
 
-    res.status(200).json({
-        success: true,
-        data: usr
-    })
+exports.updateUser = async (req, res, next) => {
+	const id = req.params.id;
+	const userFields = {};
 
+	const { errors, isValid } = isValidateProfile(req.body);
 
-    
-}
+	if (!isValid) {
+		return next(new ErrorResponse(errors, 400));
+	}
 
-exports.updateUser = async (req,res,next)=>{
-    const id = req.params.id;
-    const userFields = {};
- 
-    const {errors, isValid} = isValidateProfile(req.body);
+	if (req.body.name) userFields.name = req.body.name;
 
-    if(!isValid){
-        return next(new ErrorResponse(errors,400))
-    }
+	if (req.body.email) userFields.email = req.body.email;
 
-    if(req.body.name) userFields.name = req.body.name;
+	if (req.body.bio) userFields.bio = req.body.bio;
 
-    if(req.body.email) userFields.email = req.body.email;
+	// Social profiles
+	userFields.social_profile = {};
 
-    if(req.body.bio) userFields.bio = req.body.bio;
+	if (req.body.twitter) userFields.social_profile.twitter = req.body.twitter;
 
-    // Social profiles
-    userFields.social_profile = {};
+	if (req.body.facebook) userFields.social_profile.facebook = req.body.facebook;
 
-    if(req.body.twitter) userFields.social_profile.twitter = req.body.twitter;
+	if (req.body.instagram)
+		userFields.social_profile.instagram = req.body.instagram;
 
-    if(req.body.facebook) userFields.social_profile.facebook = req.body.facebook;
+	const { error, statusCode, data } = await userService.updateUser(
+		id,
+		userFields
+	);
 
-    if(req.body.instagram) userFields.social_profile.instagram = req.body.instagram;
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
 
-    const user = await User.findOneAndUpdate({id:id},userFields,{new:true})
+	res.status(statusCode).json({
+		success: true,
+		data,
+	});
+};
 
-    if(!user){
-        next(new ErrorResponse("Update Failed",400))
-    }
+exports.uploadProfile = async (req, res, next) => {
+	const id = req.params.id;
 
-    res.status(200).json({
-        success: true,
-        data: user
-    });
-}
+	const files = req.files;
+	if (!files) {
+		return next(new ErrorResponse("image not found", 400));
+	}
+	const { error, statusCode, data } = await userService.uploadProfile(
+		id,
+		files
+	);
+
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		data,
+	});
+};

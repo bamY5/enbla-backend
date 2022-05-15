@@ -11,7 +11,7 @@ const MealThread = new mongoose.Schema({
 		maxlength: 150,
 	},
 	media: {
-		type: [{ filepath: String, filename: String }],
+		type: [{ imageUrl: String, imageId: String }],
 		maxlength: 6,
 	},
 	is_reply: {
@@ -38,6 +38,10 @@ const MealThread = new mongoose.Schema({
 			default: 0,
 		},
 	},
+	removed: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 MealThread.pre("save", function () {
@@ -50,4 +54,4 @@ MealThread.pre("save", function () {
 	}
 });
 
-module.exports = mongoose.model("MealModel", MealThread);
+module.exports = mongoose.model("Meal", MealThread);

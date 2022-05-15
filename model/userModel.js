@@ -38,7 +38,8 @@ const UserModel = new mongoose.Schema(
 			maxlength: 200,
 		},
 		profile_image: {
-			type: String,
+			imageUrl: String,
+			imageId: String,
 		},
 		birthday: {
 			type: String,
@@ -64,12 +65,6 @@ const UserModel = new mongoose.Schema(
 UserModel.pre("save", async function (next) {
 	const salt = await bcrypt.genSalt(10);
 	this.password = await bcrypt.hash(this.password, salt);
-
-	if (this.profile_image) {
-		this.profile_image = `profile_${this.id}${
-			path.parse(this.profile_image).ext
-		}`;
-	}
 });
 
 // JWT token generate
@@ -82,7 +77,9 @@ UserModel.methods.signWithJWT = function () {
 
 // Password match
 UserModel.methods.matchPassword = async function (enteredPassword) {
-	return await bcrypt.compare(enteredPassword, this.password);
+	const ret = await bcrypt.compare(enteredPassword, this.password);
+
+	return ret;
 };
 
-module.exports = mongoose.model("UserModel", UserModel);
+module.exports = mongoose.model("User", UserModel);

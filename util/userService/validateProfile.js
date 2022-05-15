@@ -1,5 +1,5 @@
 const validator = require("validator");
-const isEmpty = require("../util/isEmpty");
+const isEmpty = require("../isEmpty");
 
 const isValidateProfile = (data) => {
 	const errors = {};

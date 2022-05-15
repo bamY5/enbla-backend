@@ -1,7 +1,24 @@
 const validator = require("validator");
-const isEmpty = require("../util/isEmpty");
+const isEmpty = require("../isEmpty");
 
-const validateInput = (obj) => {
+exports.signin = (obj) => {
+	const errors = {};
+
+	if (validator.isEmpty(obj.username)) {
+		errors.username = "Username is required";
+	}
+
+	if (validator.isEmpty(obj.password)) {
+		errors.password = "Password is required";
+	}
+
+	return {
+		err: errors,
+		isValid: isEmpty(errors),
+	};
+};
+
+exports.register = (obj) => {
 	const errors = {};
 
 	obj.name = !isEmpty(obj.name) ? obj.name : "";
@@ -31,5 +48,3 @@ const validateInput = (obj) => {
 		isValid: isEmpty(errors),
 	};
 };
-
-module.exports = validateInput;

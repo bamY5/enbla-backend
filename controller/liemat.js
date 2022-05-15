@@ -1,59 +1,67 @@
 var fs = require("fs");
 const Liemat = require("../model/liematModel");
 const ErrorResponse = require("../util/errorResponse");
-const { singleUser } = require("../util/singleUser");
+
+const liematSevice = require("../util/liematService/liematService");
 
 exports.getLiemat = async (req, res, next) => {
 	const page = parseInt(req.query.page, 10) || 1;
 	const limit = parseInt(req.query.limit, 10) || 5;
 
-	const liemat = await Liemat.find()
-		.limit(limit)
-		.skip((page - 1) * limit);
+	const { error, statusCode, data } = await liematSevice.getLiemat(page, limit);
 
-	res.json({
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
+	res.status(statusCode).json({
 		success: true,
-		count: liemat.length,
-		data: liemat,
+		count: data.length,
+		data,
 	});
 };
 
 exports.getLiematById = async (req, res, next) => {
 	const id = req.params.id;
 
-	const liemat = await Liemat.findById(id);
+	const { error, statusCode, data } = await liematSevice.getLiematById(id);
 
-	res.json({
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
+
+	res.status(statusCode).json({
 		success: true,
-		data: liemat,
+		count: data.length,
+		data,
 	});
 };
 
 exports.getByCreator = async (req, res, next) => {
-	const creatorId = req.params.creatorId;
+	const creatorId = req.params.id;
 	const page = parseInt(req.query.page, 10) || 1;
 	const limit = parseInt(req.query.limit, 10) || 5;
+	console.log(creatorId);
+	const { error, statusCode, data } = await liematSevice.getByCreator(
+		creatorId,
+		page,
+		limit
+	);
 
-	const liemat = await Liemat.find({ "creator.id": creatorId })
-		.limit(limit)
-		.skip((page - 1) * limit);
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
 
-	res.json({
+	res.status(statusCode).json({
 		success: true,
-		data: liemat,
+		count: data.length,
+		data,
 	});
 };
 
 exports.createLiemat = async (req, res, next) => {
 	const userId = req.user.id;
-	const user = await singleUser(userId);
 
-	if (Object.keys(user).length === 0) {
-		return next(new ErrorResponse("User not found", 400));
-	}
-
-	const data = {
-		creator: user,
+	const input = {
 		phoneNumber: req.user.phone,
 		place: req.body.place,
 		time: req.body.time,
@@ -62,70 +70,68 @@ exports.createLiemat = async (req, res, next) => {
 		description: req.body.description,
 		numberOfJoiners: req.body.numberOfJoiners,
 	};
-	let liemat = await Liemat.create(data);
 
-	if (!liemat) {
-		return next(new ErrorResponse("Operation was unsuccessful"));
+	const { error, statusCode, data } = await liematSevice.createLiemat(
+		userId,
+		input
+	);
+
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
 	}
-	res.json({
+	res.status(statusCode).json({
 		success: true,
-		data: liemat,
+		data,
 	});
 };
 
 exports.joinLiemat = async (req, res, next) => {
 	const id = req.params.id;
-	const liemat = await Liemat.findById(id);
 
-	if (!liemat) {
-		return next(new ErrorResponse("Liemat not found", 400));
-	}
-
-	const updatedLiemat = await Liemat.findByIdAndUpdate(
+	const { error, statusCode, data } = await liematSevice.joinLiemat(
 		id,
-		{ $push: { joiners: req.user.id }, $inc: { joined: 1 } },
-		{ new: true }
+		req.user.id
 	);
 
-	if (!updatedLiemat) {
-		return next(new ErrorResponse("Server error", 500));
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
 	}
-	res.status(200).json({
+
+	res.status(statusCode).json({
 		success: true,
-		data: updatedLiemat,
+		data,
 	});
 };
 
 exports.leaveLieamt = async (req, res, next) => {
 	const id = req.params.id;
 
-	const liemat = await Liemat.findOneAndUpdate(
+	const { error, statusCode, data } = await liematSevice.leaveLieamt(
 		id,
-		{ $pull: { joiners: req.user.id }, $inc: { joined: -1 } },
-		{ new: true }
+		req.user.id
 	);
 
-	if (!liemat) {
-		return next(new ErrorResponse("Liemat not found"), 400);
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
 	}
 
-	res.status(200).json({
+	res.status(statusCode).json({
 		success: true,
-		data: liemat,
+		data,
 	});
 };
 
 exports.deleteLiemat = async (req, res, next) => {
 	const id = req.params.id;
 
-	const liemat = await Liemat.findOneAndDelete(id);
+	const { error, statusCode, data } = await liematSevice.deleteLiemat(id);
 
-	if (!liemat) {
-		return next(new ErrorResponse("Liemat not found", 400));
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
 	}
 
-	res.status(200).json({
+	res.status(statusCode).json({
 		success: true,
-		data: liemat,
+		data,
 	});
 };
