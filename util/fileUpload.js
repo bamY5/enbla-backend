@@ -10,7 +10,7 @@ exports.upload = async (image, folder) => {
 		const file64 = parser.format(extName, image.data);
 
 		const result = await cloudinary.uploader.upload(file64.content, {
-			folder,
+			folder: `${process.env.CLOUDINARY_BASE_FOLDER}/${folder}`,
 		});
 
 		return {
