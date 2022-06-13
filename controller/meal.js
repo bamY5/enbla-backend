@@ -2,6 +2,7 @@ const MealThread = require("../model/mealModel");
 const ErrorResponse = require("../util/errorResponse");
 const { validate } = require("../util/mealService/validateMealInput");
 const threadService = require("../util/mealService/meal_service");
+const ObjectID = require("mongodb").ObjectId;
 
 exports.getThread = async (req, res, next) => {
 	const page = parseInt(req.query.page, 10) || 1;
@@ -22,7 +23,6 @@ exports.getThread = async (req, res, next) => {
 
 exports.createThread = async (req, res, next) => {
 	const post = {};
-	let meal;
 	const { error, isValid } = validate(req.body);
 
 	if (!isValid) {
@@ -30,14 +30,10 @@ exports.createThread = async (req, res, next) => {
 	}
 
 	post.text = req.body.text;
-	post.creator = req.user.id;
+	post.creator = ObjectID(req.user.id);
 	const files = req.files;
 
-	const { err, statusCode, data } = await threadService.newThread(
-		post,
-		files,
-		req.user
-	);
+	const { err, statusCode, data } = await threadService.newThread(post, files);
 
 	if (err) {
 		return next(new ErrorResponse(err, statusCode));
@@ -66,8 +62,7 @@ exports.replyToThread = async (req, res, next) => {
 	const { err, statusCode, data } = await threadService.replyThread(
 		post,
 		files,
-		threadId,
-		req.user
+		ObjectID(threadId)
 	);
 
 	if (err) {
@@ -84,8 +79,26 @@ exports.likeThread = async (req, res, next) => {
 	const id = req.params.id;
 
 	const { err, statusCode, data } = await threadService.likeThread(
-		id,
-		req.user.id
+		ObjectID(id),
+		ObjectID(req.user.id)
+	);
+
+	if (err) {
+		return next(new ErrorResponse(err, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		data,
+	});
+};
+
+exports.unlikeThread = async (req, res, next) => {
+	const id = req.params.id;
+
+	const { err, statusCode, data } = await threadService.unlikeThread(
+		ObjectID(id),
+		ObjectID(req.user.id)
 	);
 
 	if (err) {
@@ -100,7 +113,9 @@ exports.likeThread = async (req, res, next) => {
 
 exports.deleteThread = async (req, res, next) => {
 	const id = req.params.id;
-	const { err, statusCode, data } = await threadService.deleteThread(id);
+	const { err, statusCode, data } = await threadService.deleteThread(
+		ObjectID(id)
+	);
 
 	if (err) {
 		return next(new ErrorResponse(err, statusCode));

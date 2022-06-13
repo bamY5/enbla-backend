@@ -11,6 +11,8 @@ router.put("/:id", authorize, mealController.replyToThread);
 
 router.put("/like/:id", authorize, mealController.likeThread);
 
+router.put("/unlike/:id", authorize, mealController.unlikeThread);
+
 router.delete("/:id", authorize, mealController.deleteThread);
 
 module.exports = router;

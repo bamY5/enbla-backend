@@ -29,7 +29,9 @@ exports.updateUser = async (req, res, next) => {
 		return next(new ErrorResponse(errors, 400));
 	}
 
-	if (req.body.name) userFields.name = req.body.name;
+	if (req.body.firstname) userFields.firstname = req.body.firstname;
+
+	if (req.body.lastname) userFields.lastname = req.body.lastname;
 
 	if (req.body.email) userFields.email = req.body.email;
 
@@ -70,6 +72,42 @@ exports.uploadProfile = async (req, res, next) => {
 	const { error, statusCode, data } = await userService.uploadProfile(
 		id,
 		files
+	);
+
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		data,
+	});
+};
+
+exports.followUser = async (req, res, next) => {
+	const id = req.params.id;
+
+	const { error, statusCode, data } = await userService.followUser(
+		req.user.id,
+		id
+	);
+
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		data,
+	});
+};
+
+exports.unfollowUser = async (req, res, next) => {
+	const id = req.params.id;
+
+	const { error, statusCode, data } = await userService.unfollowUser(
+		req.user.id,
+		id
 	);
 
 	if (error) {

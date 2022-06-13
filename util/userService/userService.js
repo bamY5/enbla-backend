@@ -100,3 +100,57 @@ exports.uploadProfile = async (id, media) => {
 		return { error, statusCode: 500, data: null };
 	}
 };
+
+exports.followUser = async (follower_user_id, followed_user_id) => {
+	try {
+		const user = await User.findByIdAndUpdate(
+			followed_user_id,
+			{
+				$push: { "public_metrics.follower": follower_user_id },
+				$inc: { "public_metrics.follower_count": 1 },
+			},
+			{ new: true }
+		);
+
+		if (user) {
+			return {
+				error: null,
+				statusCode: 200,
+				data: user,
+			};
+		}
+	} catch (error) {
+		return {
+			error: error.message,
+			statusCode: 500,
+			data: null,
+		};
+	}
+};
+
+exports.unfollowUser = async (follower_user_id, followed_user_id) => {
+	try {
+		const user = await User.findByIdAndUpdate(
+			followed_user_id,
+			{
+				$pull: { "public_metrics.follower": follower_user_id },
+				$inc: { "public_metrics.follower_count": -1 },
+			},
+			{ new: true }
+		);
+
+		if (user) {
+			return {
+				error: null,
+				statusCode: 200,
+				data: user,
+			};
+		}
+	} catch (error) {
+		return {
+			error: error.message,
+			statusCode: 500,
+			data: null,
+		};
+	}
+};

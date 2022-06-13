@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
-const path = require("path");
+const mongoose_fuzzy_search = require("mongoose-fuzzy-searching");
+const { type } = require("os");
 
 const MealThread = new mongoose.Schema({
 	creator: {
-		type: Object,
+		type: [mongoose.Schema.ObjectId],
+		ref: "User",
 		required: true,
 	},
 	text: {
@@ -44,14 +46,8 @@ const MealThread = new mongoose.Schema({
 	},
 });
 
-MealThread.pre("save", function () {
-	if (this.media) {
-		for (var i = 0; i < this.media.length; i++) {
-			let image = this.media[i].filename;
-			let filename = `${i}${path.parse(image).ext}`;
-			this.media[i] = { filepath: "", filename: filename };
-		}
-	}
+MealThread.plugin(mongoose_fuzzy_search, {
+	fields: [{ name: "text", minSize: 3 }],
 });
 
 module.exports = mongoose.model("Meal", MealThread);

@@ -6,6 +6,7 @@ const { upload, deleteImage } = require("../fileUpload");
 exports.getThread = async (page, limit) => {
 	try {
 		const threads = await MealThread.find()
+			.populate("creator")
 			.limit(limit)
 			.skip((page - 1) * limit);
 
@@ -24,11 +25,11 @@ exports.getThread = async (page, limit) => {
 };
 
 exports.newThread = async (query, media, user) => {
-	return await thread(query, media, user, false);
+	return await thread(query, media, false);
 };
 
-exports.replyThread = async (query, media, threadId, user) => {
-	const { error, data } = await thread(query, media, user, true);
+exports.replyThread = async (query, media, threadId) => {
+	const { error, data } = await thread(query, media, true);
 
 	if (error) {
 		return {
@@ -87,13 +88,36 @@ exports.likeThread = async (id, userId) => {
 	}
 };
 
+exports.unlikeThread = async (id, userId) => {
+	try {
+		const thread = await MealThread.findByIdAndUpdate(
+			id,
+			{
+				$pull: { "public_metrices.likes": userId },
+				$inc: { "public_metrices.like_count": -1 },
+			},
+			{ new: true }
+		);
+		return {
+			err: null,
+			statusCode: 200,
+			data: thread,
+		};
+	} catch (error) {
+		return {
+			err: error.message,
+			statusCode: 500,
+			data: null,
+		};
+	}
+};
+
 exports.deleteThread = async (id) => {
 	try {
 		const res = await MealThread.findById(id);
 
 		//delete from cloudinary
 		for (const media of res.media) {
-			console.log(media.imageId);
 			const { error, result } = await deleteImage(media.imageId);
 			if (error) {
 				return {
@@ -120,14 +144,13 @@ exports.deleteThread = async (id) => {
 	}
 };
 
-const thread = async (query, media, user, isReply) => {
+const thread = async (query, media, isReply) => {
 	try {
 		if (isReply) {
 			query.is_reply = true;
 		}
 
 		let meal = await MealThread.create(query);
-		var i = 0;
 
 		const tempMedia = [];
 		for (var prop in media) {

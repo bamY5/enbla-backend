@@ -32,7 +32,8 @@ exports.register = async (req, res, next) => {
 	}
 
 	const obj = {
-		name: req.body.name,
+		firstname: req.body.firstname,
+		lastname: req.body.lastname,
 		username: req.body.username,
 		phone: req.body.phone,
 		password: req.body.password,
@@ -45,7 +46,9 @@ exports.register = async (req, res, next) => {
 			instagram: req.body.instagram || "",
 		},
 		public_metrics: {
+			follower: [],
 			follower_count: 0,
+			following: [],
 			following_count: 0,
 		},
 	};

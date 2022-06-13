@@ -1,7 +1,7 @@
 var fs = require("fs");
 const Liemat = require("../model/liematModel");
 const ErrorResponse = require("../util/errorResponse");
-
+const ObjectID = require("mongodb").ObjectId;
 const liematSevice = require("../util/liematService/liematService");
 
 exports.getLiemat = async (req, res, next) => {
@@ -42,7 +42,7 @@ exports.getByCreator = async (req, res, next) => {
 	const limit = parseInt(req.query.limit, 10) || 5;
 	console.log(creatorId);
 	const { error, statusCode, data } = await liematSevice.getByCreator(
-		creatorId,
+		ObjectID(creatorId),
 		page,
 		limit
 	);
@@ -62,6 +62,7 @@ exports.createLiemat = async (req, res, next) => {
 	const userId = req.user.id;
 
 	const input = {
+		creator: ObjectID(userId),
 		phoneNumber: req.user.phone,
 		place: req.body.place,
 		time: req.body.time,
@@ -70,11 +71,7 @@ exports.createLiemat = async (req, res, next) => {
 		description: req.body.description,
 		numberOfJoiners: req.body.numberOfJoiners,
 	};
-
-	const { error, statusCode, data } = await liematSevice.createLiemat(
-		userId,
-		input
-	);
+	const { error, statusCode, data } = await liematSevice.createLiemat(input);
 
 	if (error) {
 		return next(new ErrorResponse(error, statusCode));
@@ -90,7 +87,7 @@ exports.joinLiemat = async (req, res, next) => {
 
 	const { error, statusCode, data } = await liematSevice.joinLiemat(
 		id,
-		req.user.id
+		ObjectID(req.user.id)
 	);
 
 	if (error) {
@@ -108,7 +105,7 @@ exports.leaveLieamt = async (req, res, next) => {
 
 	const { error, statusCode, data } = await liematSevice.leaveLieamt(
 		id,
-		req.user.id
+		ObjectID(req.user.id)
 	);
 
 	if (error) {

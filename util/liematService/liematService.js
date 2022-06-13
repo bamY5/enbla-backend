@@ -4,6 +4,7 @@ const { singleUser } = require("../singleUser");
 exports.getLiemat = async (page, limit) => {
 	try {
 		const liemat = await Liemat.find()
+			.populate("creator")
 			.limit(limit)
 			.skip((page - 1) * limit);
 
@@ -14,7 +15,7 @@ exports.getLiemat = async (page, limit) => {
 		};
 	} catch (error) {
 		return {
-			error,
+			error: error.message,
 			statusCode: 400,
 			data: null,
 		};
@@ -32,7 +33,7 @@ exports.getLiematById = async (id) => {
 		};
 	} catch (error) {
 		return {
-			error,
+			error: error.message,
 			statusCode: 400,
 			data: null,
 		};
@@ -52,18 +53,15 @@ exports.getByCreator = async (creatorId, page, limit) => {
 		};
 	} catch (error) {
 		return {
-			error,
+			error: error.message,
 			statusCode: 400,
 			data: null,
 		};
 	}
 };
 
-exports.createLiemat = async (userId, obj) => {
+exports.createLiemat = async (obj) => {
 	try {
-		const user = await singleUser(userId);
-
-		obj.creator = user;
 		const liemat = await Liemat.create(obj);
 
 		return {
@@ -73,7 +71,7 @@ exports.createLiemat = async (userId, obj) => {
 		};
 	} catch (error) {
 		return {
-			error,
+			error: error.message,
 			statusCode: 400,
 			data: null,
 		};
@@ -95,7 +93,7 @@ exports.joinLiemat = async (id, userId) => {
 		};
 	} catch (error) {
 		return {
-			error,
+			error: error.message,
 			statusCode: 400,
 			data: null,
 		};
@@ -117,7 +115,7 @@ exports.leaveLieamt = async (id, userId) => {
 		};
 	} catch (error) {
 		return {
-			error,
+			error: error.message,
 			statusCode: 400,
 			data: null,
 		};
@@ -134,7 +132,7 @@ exports.deleteLiemat = async (id) => {
 		};
 	} catch (error) {
 		return {
-			error,
+			error: error.message,
 			statusCode: 400,
 			data: null,
 		};

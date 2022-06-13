@@ -1,18 +1,23 @@
 const mongoose = require("mongoose");
+const mongoose_fuzzy_searching = require("mongoose-fuzzy-searching");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 
 const UserModel = new mongoose.Schema(
 	{
-		name: {
-			type: String,
-			required: [true, "Please add a name"],
-		},
 		username: {
 			type: String,
 			required: [true, "Please add a username"],
 			unique: true,
+		},
+		firstname: {
+			type: String,
+			required: [true, "Please add firstname"],
+		},
+		lastname: {
+			type: String,
+			required: [true, "Please add lastname"],
 		},
 		phone: {
 			type: String,
@@ -24,8 +29,8 @@ const UserModel = new mongoose.Schema(
 			minlength: 6,
 			select: false,
 		},
-		resetPasswordToken: String,
-		resetPasswordExpire: Date,
+		resetPasswordToken: { type: String, select: false },
+		resetPasswordExpire: { type: Date, select: false },
 		email: {
 			type: String,
 			match: [
@@ -50,21 +55,47 @@ const UserModel = new mongoose.Schema(
 			instagram: { type: String },
 		},
 		public_metrics: {
+			follower: {
+				type: [mongoose.Schema.ObjectId],
+				ref: "UserModel",
+				default: [],
+			},
 			follower_count: Number,
+			following: {
+				type: [mongoose.Schema.ObjectId],
+				ref: "UserModel",
+				default: [],
+			},
 			following_count: Number,
 		},
 		verified: {
 			type: Boolean,
 			default: false,
+			select: false,
 		},
 	},
 	{ timestamps: { created_at: "created_at", modified_at: "modified_at" } }
 );
 
-// Encrypt password using bcrypt
-UserModel.pre("save", async function (next) {
-	const salt = await bcrypt.genSalt(10);
-	this.password = await bcrypt.hash(this.password, salt);
+UserModel.plugin(mongoose_fuzzy_searching, {
+	fields: [
+		{
+			name: "firstname",
+			minSize: 2,
+		},
+		{
+			name: "lastname",
+			minSize: 2,
+		},
+		{ name: "username", minSize: 2 },
+	],
+	middlewares: {
+		preSave: async function () {
+			// Encrypt password using bcrypt
+			const salt = await bcrypt.genSalt(10);
+			this.password = await bcrypt.hash(this.password, salt);
+		},
+	},
 });
 
 // JWT token generate

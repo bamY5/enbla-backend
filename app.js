@@ -17,6 +17,7 @@ const liemat = require("./routes/liemat");
 const meal = require("./routes/meal");
 const user = require("./routes/user");
 const auth = require("./routes/auth");
+const search = require("./routes/search");
 
 // mount
 const app = express();
@@ -33,6 +34,7 @@ app.use("/api/v1/liemat", liemat);
 app.use("/api/v1/meal", meal);
 app.use("/api/v1/user", user);
 app.use("/api/v1/auth", auth);
+app.use("/api/v1/search", search);
 
 // Error handler
 app.use(ErrorHandler);
