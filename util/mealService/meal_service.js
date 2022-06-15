@@ -24,6 +24,65 @@ exports.getThread = async (page, limit) => {
 	}
 };
 
+exports.getThreadById = async (id) => {
+	try {
+		const thread = await MealThread.findById(id).populate("creator");
+
+		return {
+			err: null,
+			statusCode: 200,
+			data: thread,
+		};
+	} catch (error) {
+		return {
+			err: error.message,
+			statusCode: 500,
+			result: null,
+		};
+	}
+};
+
+exports.getThreadByCreator = async (creatorId, page, limit) => {
+	try {
+		const threads = await MealThread.findById(creatorId)
+			.populate("creator")
+			.limit(limit)
+			.skip((page - 1) * limit);
+
+		return {
+			err: null,
+			statusCode: 200,
+			data: threads,
+		};
+	} catch (error) {
+		return {
+			err: error.message,
+			statusCode: 500,
+			result: null,
+		};
+	}
+};
+
+exports.getThreadReplys = async (id, page, limit) => {
+	try {
+		const threads = await MealThread.findById(id)
+			.populate("creator")
+			.limit(limit)
+			.skip((page - 1) * limit);
+
+		return {
+			err: null,
+			statusCode: 200,
+			data: threads,
+		};
+	} catch (error) {
+		return {
+			err: error.message,
+			statusCode: 500,
+			result: null,
+		};
+	}
+};
 exports.newThread = async (query, media, user) => {
 	return await thread(query, media, false);
 };

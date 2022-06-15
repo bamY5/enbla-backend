@@ -21,6 +21,66 @@ exports.getThread = async (req, res, next) => {
 	});
 };
 
+exports.getThreadById = async (req, res, next) => {
+	const id = req.params.id;
+
+	const { err, statusCode, data } = await threadService.getThreadById(id);
+
+	if (err) {
+		return next(new ErrorResponse(err, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		count: data.length,
+		data,
+	});
+};
+
+exports.getThreadByCreator = async (req, res, next) => {
+	const creatorId = req.params.creatorID;
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 5;
+
+	const { err, statusCode, data } = await threadService.getThreadByCreator(
+		creatorId,
+		page,
+		limit
+	);
+
+	if (err) {
+		return next(new ErrorResponse(err, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		count: data.length,
+		data,
+	});
+};
+
+exports.getThreadReplys = async (req, res, next) => {
+	const id = req.params.id;
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 5;
+
+	const { err, statusCode, data } = await threadService.getThreadReplys(
+		id,
+		page,
+		limit
+	);
+
+	if (err) {
+		return next(new ErrorResponse(err, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		count: data.length,
+		data,
+	});
+};
+
 exports.createThread = async (req, res, next) => {
 	const post = {};
 	const { error, isValid } = validate(req.body);
