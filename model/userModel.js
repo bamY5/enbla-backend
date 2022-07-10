@@ -3,6 +3,7 @@ const mongoose_fuzzy_searching = require("mongoose-fuzzy-searching");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const path = require("path");
+const { truncate } = require("fs");
 
 const UserModel = new mongoose.Schema(
 	{
@@ -37,22 +38,25 @@ const UserModel = new mongoose.Schema(
 				/^\w+([\.-]?\w+)*@\w+([\.-]?)*(\.\w{2,3})+$/,
 				"Please add a valid email",
 			],
+			default: "",
 		},
 		bio: {
 			type: String,
 			maxlength: 200,
+			default: "",
 		},
 		profile_image: {
-			imageUrl: String,
-			imageId: String,
+			imageUrl: { type: String, default: "" },
+			imageId: { type: String, default: "" },
 		},
 		birthday: {
 			type: String,
+			required: truncate,
 		},
 		social_profile: {
-			twitter: { type: String },
-			facebook: { type: String },
-			instagram: { type: String },
+			twitter: { type: String, default: "" },
+			facebook: { type: String, default: "" },
+			instagram: { type: String, default: "" },
 		},
 		public_metrics: {
 			follower: {
@@ -60,13 +64,13 @@ const UserModel = new mongoose.Schema(
 				ref: "UserModel",
 				default: [],
 			},
-			follower_count: Number,
+			follower_count: { type: Number, default: 0 },
 			following: {
 				type: [mongoose.Schema.ObjectId],
 				ref: "UserModel",
 				default: [],
 			},
-			following_count: Number,
+			following_count: { type: Number, default: 0 },
 		},
 		verified: {
 			type: Boolean,

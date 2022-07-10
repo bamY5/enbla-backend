@@ -37,27 +37,10 @@ exports.register = async (req, res, next) => {
 		username: req.body.username,
 		phone: req.body.phone,
 		password: req.body.password,
-		email: req.body.email || "",
-		bio: req.body.bio || "",
 		birthday: req.body.birthday || "",
-		social_profile: {
-			twitter: req.body.twitter || "",
-			facebook: req.body.facebook || "",
-			instagram: req.body.instagram || "",
-		},
-		public_metrics: {
-			follower: [],
-			follower_count: 0,
-			following: [],
-			following_count: 0,
-		},
 	};
 
-	const files = req.files;
-	const { error, statusCode, data } = await authService.registerUser(
-		obj,
-		files
-	);
+	const { error, statusCode, data } = await authService.registerUser(obj);
 
 	if (error) {
 		return next(new ErrorResponse(error, statusCode));

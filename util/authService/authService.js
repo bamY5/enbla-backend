@@ -43,7 +43,7 @@ exports.signIn = async (obj) => {
 	}
 };
 
-exports.registerUser = async (obj, media) => {
+exports.registerUser = async (obj) => {
 	try {
 		if (await User.findOne({ username: obj.username })) {
 			return {
@@ -52,32 +52,14 @@ exports.registerUser = async (obj, media) => {
 				data: null,
 			};
 		}
-		if (media) {
-			const { error, result } = await upload(media.profile, "profile");
-			if (error) {
-				console.log(error);
-				return {
-					err: error.message,
-					statusCode: 500,
-					data: null,
-				};
-			}
-			obj.profile_image = {
-				imageUrl: result.secure_url,
-				imageId: result.public_id,
-			};
-		}
-
 		let user = await User.create(obj);
 
-		user = await singleUser(user.id);
 		return {
 			error: null,
 			statusCode: 200,
-			data: user,
+			data: "User Successfully Registered!",
 		};
 	} catch (error) {
-		console.log(error);
 		return {
 			error,
 			statusCode: 400,
