@@ -101,7 +101,13 @@ UserModel.plugin(mongoose_fuzzy_searching, {
 // JWT token generate
 UserModel.methods.signWithJWT = function () {
 	return jwt.sign(
-		{ id: this._id, username: this.username },
+		{
+			id: this._id,
+			username: this.username,
+			firstname: this.firstname,
+			lastname: this.lastname,
+			profile_image: this.profile_image,
+		},
 		process.env.JWT_SECRET
 	);
 };
