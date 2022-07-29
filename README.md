@@ -2,4 +2,4 @@
 
 #To Run the server
 #   npm install
-#   node app
+#   npm run dev
