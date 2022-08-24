@@ -1,4 +1,3 @@
-const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
 const body_parser = require("body-parser");
