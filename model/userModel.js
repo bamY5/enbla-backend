@@ -51,7 +51,7 @@ const UserModel = new mongoose.Schema(
 		},
 		birthday: {
 			type: String,
-			required: truncate,
+			required: true,
 		},
 		social_profile: {
 			twitter: { type: String, default: "" },
