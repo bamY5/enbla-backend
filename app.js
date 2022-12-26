@@ -4,6 +4,7 @@ const body_parser = require("body-parser");
 const ErrorHandler = require("./middleware/error");
 const morgan = require("morgan");
 const fileupload = require("express-fileupload");
+const cors = require("cors");
 //config
 dotenv.config({ path: "./config/config.env" });
 const PORT = process.env.PORT || 5000;
@@ -20,6 +21,7 @@ const search = require("./routes/search");
 
 // mount
 const app = express();
+app.use(cors());
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({ extended: true }));
 
