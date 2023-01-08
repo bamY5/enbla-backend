@@ -1,5 +1,6 @@
 const path = require("path");
 const MealThread = require("../../model/mealModel");
+const Liemat = require("../../model/liematModel");
 const fs = require("fs");
 const { upload, deleteImage } = require("../fileUpload");
 
@@ -208,6 +209,7 @@ const thread = async (query, media, isReply) => {
 		if (isReply) {
 			query.is_reply = true;
 		}
+		await Liemat.findById(query.event_id);
 
 		let meal = await MealThread.create(query);
 

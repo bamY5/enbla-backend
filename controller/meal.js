@@ -90,6 +90,7 @@ exports.createThread = async (req, res, next) => {
 	}
 
 	post.text = req.body.text;
+	post.event_id = req.body.event_id;
 	post.creator = ObjectID(req.user.id);
 	const files = req.files;
 

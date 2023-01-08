@@ -8,6 +8,11 @@ const MealThread = new mongoose.Schema({
 		ref: "User",
 		required: true,
 	},
+	event_id: {
+		type: [mongoose.Schema.ObjectId],
+		ref: "Liemat",
+		required: true,
+	},
 	text: {
 		type: String,
 		maxlength: 150,
