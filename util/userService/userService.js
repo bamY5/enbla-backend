@@ -2,7 +2,7 @@ const User = require("../../model/userModel");
 const { upload, deleteImage } = require("../fileUpload");
 const { singleUser } = require("../singleUser");
 
-exports.getUserById = async (id) => {
+exports.getUserProfile = async (id) => {
 	try {
 		let user = await User.findById(id);
 
@@ -14,12 +14,54 @@ exports.getUserById = async (id) => {
 			};
 		}
 
-		user = await singleUser(user.id);
+		return {
+			error: null,
+			statusCode: 200,
+			data: user,
+		};
+	} catch (error) {
+		return {
+			error,
+			statusCode: 400,
+			data: null,
+		};
+	}
+};
+exports.getUserByUsername = async (username) => {
+	try {
+		let user = await User.find({ username });
+
+		if (!user) {
+			return {
+				error: "User not found",
+				statusCode: 400,
+				data: null,
+			};
+		}
 
 		return {
 			error: null,
 			statusCode: 200,
 			data: user,
+		};
+	} catch (error) {
+		return {
+			error,
+			statusCode: 400,
+			data: null,
+		};
+	}
+};
+
+exports.getUsers = async (page, limit) => {
+	try {
+		const users = await User.find()
+			.limit(limit)
+			.skip((page - 1) * limit);
+		return {
+			error: null,
+			statusCode: 200,
+			data: users,
 		};
 	} catch (error) {
 		return {

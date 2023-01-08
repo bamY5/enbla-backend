@@ -3,11 +3,46 @@ const ErrorResponse = require("../util/errorResponse");
 const matchUser = require("../util/matchUser");
 const isValidateProfile = require("../util/userService/validateProfile");
 const userService = require("../util/userService/userService");
+const isEmpty = require("../util/isEmpty");
 
 exports.getUser = async (req, res, next) => {
-	const id = req.params.id;
+	const id = req.user.id;
+	const { error, statusCode, data } = await userService.getUserProfile(id);
 
-	const { error, statusCode, data } = await userService.getUserById(id);
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		data,
+	});
+};
+
+exports.getUsers = async (req, res, next) => {
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 5;
+
+	const { error, statusCode, data } = await userService.getUsers(page, limit);
+	if (error) {
+		return next(new ErrorResponse(error, statusCode));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		count: data.length,
+		data,
+	});
+};
+
+exports.getUserByUsername = async (req, res, next) => {
+	if (isEmpty(req.body.username)) {
+		return next(new ErrorResponse("Username is Reuired", 400));
+	}
+
+	const { error, statusCode, data } = await userService.getUserByUsername(
+		req.body.username
+	);
 
 	if (error) {
 		return next(new ErrorResponse(error, statusCode));

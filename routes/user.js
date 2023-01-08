@@ -7,9 +7,15 @@ const {
 	uploadProfile,
 	followUser,
 	unfollowUser,
+	getUserByUsername,
+	getUsers,
 } = require("../controller/user");
 
-router.get("/:id", getUser);
+router.get("/profile", authorize, getUser);
+
+router.get("/", getUsers);
+
+router.post("/", getUserByUsername);
 
 router.put("/:id", authorize, updateUser);
 
