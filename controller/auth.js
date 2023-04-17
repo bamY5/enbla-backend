@@ -37,6 +37,7 @@ exports.register = async (req, res, next) => {
 		username: req.body.username,
 		phone: req.body.phone,
 		password: req.body.password,
+		email: req.body.email,
 		birthday: req.body.birthday || "",
 	};
 

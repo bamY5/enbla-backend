@@ -47,7 +47,7 @@ exports.registerUser = async (obj) => {
 	try {
 		if (await User.findOne({ username: obj.username })) {
 			return {
-				error: "User alreadly exist",
+				error: "User already exist",
 				statusCode: 400,
 				data: null,
 			};
@@ -60,6 +60,7 @@ exports.registerUser = async (obj) => {
 			data: "User Successfully Registered!",
 		};
 	} catch (error) {
+		console.log(error);
 		return {
 			error,
 			statusCode: 400,
