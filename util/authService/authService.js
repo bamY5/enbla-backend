@@ -31,7 +31,12 @@ exports.signIn = async (obj) => {
 			return {
 				error: null,
 				statusCode: 200,
-				data: token,
+				data: {
+					token: token,
+					firstname: user.firstname,
+					lastname: user.lastname,
+					email: user.email,
+				},
 			};
 		}
 	} catch (error) {
