@@ -10,7 +10,7 @@ exports.signin = async (req, res, next) => {
 		return next(new ErrorResponse(err, 400));
 	}
 	const input = {};
-	input.username = req.body.username;
+	input.phone = req.body.phone;
 	input.password = req.body.password;
 
 	const { error, statusCode, data } = await authService.signIn(input);
@@ -32,18 +32,15 @@ exports.register = async (req, res, next) => {
 	}
 
 	const obj = {
-		firstname: req.body.firstname,
-		lastname: req.body.lastname,
-		username: req.body.username,
+		fullName: req.body.fullName,
 		phone: req.body.phone,
 		password: req.body.password,
-		email: req.body.email,
-		birthday: req.body.birthday || "",
 	};
 
 	const { error, statusCode, data } = await authService.registerUser(obj);
 
 	if (error) {
+		console.log(error)
 		return next(new ErrorResponse(error, statusCode));
 	}
 

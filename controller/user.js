@@ -35,24 +35,24 @@ exports.getUsers = async (req, res, next) => {
 	});
 };
 
-exports.getUserByUsername = async (req, res, next) => {
-	if (isEmpty(req.body.username)) {
-		return next(new ErrorResponse("Username is Reuired", 400));
-	}
+// exports.getUserByUsername = async (req, res, next) => {
+// 	if (isEmpty(req.body.username)) {
+// 		return next(new ErrorResponse("Username is Reuired", 400));
+// 	}
 
-	const { error, statusCode, data } = await userService.getUserByUsername(
-		req.body.username
-	);
+// 	const { error, statusCode, data } = await userService.getUserByUsername(
+// 		req.body.username
+// 	);
 
-	if (error) {
-		return next(new ErrorResponse(error, statusCode));
-	}
+// 	if (error) {
+// 		return next(new ErrorResponse(error, statusCode));
+// 	}
 
-	res.status(statusCode).json({
-		success: true,
-		data,
-	});
-};
+// 	res.status(statusCode).json({
+// 		success: true,
+// 		data,
+// 	});
+// };
 
 exports.updateUser = async (req, res, next) => {
 	const id = req.params.id;
@@ -64,9 +64,7 @@ exports.updateUser = async (req, res, next) => {
 		return next(new ErrorResponse(errors, 400));
 	}
 
-	if (req.body.firstname) userFields.firstname = req.body.firstname;
-
-	if (req.body.lastname) userFields.lastname = req.body.lastname;
+	if (req.body.fullName) userFields.firstname = req.body.fullName;
 
 	if (req.body.email) userFields.email = req.body.email;
 

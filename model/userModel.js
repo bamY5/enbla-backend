@@ -7,22 +7,14 @@ const { truncate } = require("fs");
 
 const UserModel = new mongoose.Schema(
 	{
-		username: {
+		fullName: {
 			type: String,
-			required: [true, "Please add a username"],
-			unique: true,
-		},
-		firstname: {
-			type: String,
-			required: [true, "Please add firstname"],
-		},
-		lastname: {
-			type: String,
-			required: [true, "Please add lastname"],
+			required: [true, "Please add a full name"],
 		},
 		phone: {
 			type: String,
 			required: true,
+			unique: true
 		},
 		password: {
 			type: String,
@@ -51,7 +43,6 @@ const UserModel = new mongoose.Schema(
 		},
 		birthday: {
 			type: String,
-			required: true,
 		},
 		social_profile: {
 			twitter: { type: String, default: "" },
@@ -84,14 +75,9 @@ const UserModel = new mongoose.Schema(
 UserModel.plugin(mongoose_fuzzy_searching, {
 	fields: [
 		{
-			name: "firstname",
+			fullName: "fullname",
 			minSize: 2,
 		},
-		{
-			name: "lastname",
-			minSize: 2,
-		},
-		{ name: "username", minSize: 2 },
 	],
 	middlewares: {
 		preSave: async function () {
@@ -107,9 +93,8 @@ UserModel.methods.signWithJWT = function () {
 	return jwt.sign(
 		{
 			id: this._id,
-			username: this.username,
-			firstname: this.firstname,
-			lastname: this.lastname,
+			fullName: this.username,
+			phone: this.phone,
 			profile_image: this.profile_image,
 		},
 		process.env.JWT_SECRET

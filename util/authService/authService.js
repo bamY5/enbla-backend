@@ -6,7 +6,7 @@ const { upload, deleteImage } = require("../fileUpload");
 
 exports.signIn = async (obj) => {
 	try {
-		var user = await User.findOne({ username: obj.username }).select(
+		var user = await User.findOne({ username: obj.phone }).select(
 			"+password"
 		);
 		if (!user) {

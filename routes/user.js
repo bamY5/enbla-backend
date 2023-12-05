@@ -15,7 +15,7 @@ router.get("/profile", authorize, getUser);
 
 router.get("/", getUsers);
 
-router.post("/", getUserByUsername);
+// router.post("/", getUserByUsername);
 
 router.put("/:id", authorize, updateUser);
 
