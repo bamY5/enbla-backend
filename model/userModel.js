@@ -3,7 +3,6 @@ const mongoose_fuzzy_searching = require("mongoose-fuzzy-searching");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const path = require("path");
-const { truncate } = require("fs");
 
 const UserModel = new mongoose.Schema(
 	{
@@ -93,7 +92,7 @@ UserModel.methods.signWithJWT = function () {
 	return jwt.sign(
 		{
 			id: this._id,
-			fullName: this.username,
+			fullName: this.fullName,
 			phone: this.phone,
 			profile_image: this.profile_image,
 		},

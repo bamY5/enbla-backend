@@ -21,7 +21,7 @@ exports.signin = (obj) => {
 exports.register = (obj) => {
 	const errors = {};
 
-	obj.firstName = !isEmpty(obj.firstname) ? obj.firstName : "";
+	obj.firstName = !isEmpty(obj.firstname) ? obj.fullName : "";
 	obj.phone = !isEmpty(obj.phone) ? obj.phone : "";
 	obj.password = !isEmpty(obj.password) ? obj.password : "";
 
