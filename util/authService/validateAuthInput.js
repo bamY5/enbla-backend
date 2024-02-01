@@ -4,8 +4,8 @@ const isEmpty = require("../isEmpty");
 exports.signin = (obj) => {
 	const errors = {};
 
-	if (validator.isEmpty(obj.username)) {
-		errors.username = "Username is required";
+	if (validator.isEmpty(obj.phone)) {
+		errors.phone = "Phone is required";
 	}
 
 	if (validator.isEmpty(obj.password)) {
